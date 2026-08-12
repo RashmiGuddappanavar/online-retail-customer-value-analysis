@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+
+# Large Datasets (>100MB Excluded for GitHub File Limit)
+retail_cleaned.csv
+**/retail_cleaned.csv
+data/processed/retail_cleaned.csv
+powerbi/powerbi_data/retail_cleaned.csv
+tableau/tableau_data/retail_cleaned.csv
+
+# Raw Dataset Excluded
+data/raw/online_retail_II.xlsx
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Temporary & Cache Files
+*.tmp
+*.temp
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+*.swp
+
+# Temporary Scratch Files
+scratch/
+
+# Credentials & Environment Variables
+.env
+*.pem
+*.key
+credentials.json

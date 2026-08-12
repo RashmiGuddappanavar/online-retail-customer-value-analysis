@@ -1,0 +1,12 @@
+Metric,Count
+Raw Total Rows,1067371
+Exact Duplicate Rows Removed,34335
+Bad Debt Rows Removed (UnitPrice < 0),5
+Test Code Rows Removed (TEST*),17
+Zero Price No-Customer Rows Removed,5944
+Final Cleaned Rows,1027071
+Flagged Cancelled Lines (IsCancelled),19100
+Missing CustomerIDs in Cleaned Data,229202
+Unique Purchasing Customers (with ID),5940
+Unique StockCodes,4758
+Unique Countries,43
