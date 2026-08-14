@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Near-Real-Time Live Dashboard | Online Retail Analytics{% endblock %}
+
+{% block content %}
+<div class="header-section">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1>Near-Real-Time Executive Dashboard</h1>
+            <p>Live transaction stream & dynamic analytical database metrics.</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div id="live-indicator-badge">
+                <span class="badge badge-high" style="font-size: 0.85rem; padding: 0.5rem 0.85rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="height: 8px; width: 8px; background-color: #f43f5e; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite;"></span>
+                    <span id="live-status-text">● LIVE</span> | Last updated: <span id="live-clock">--:--:--</span> | Auto-refresh: 3s
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SAFE LOCAL DEMO CONTROLS -->
+<div class="table-card" style="margin-bottom: 1.5rem; padding: 1rem 1.5rem; background-color: rgba(30, 41, 59, 0.7); border: 1px dashed var(--accent-blue);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <strong style="color: var(--accent-blue);">Interactive Demo Control Panel</strong>
+            <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 0.5rem;">(Local Execution Simulator Controls)</span>
+        </div>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="btn" style="padding: 0.4rem 0.85rem; font-size: 0.8rem;" onclick="triggerDemoIngest(1)">[ +1 Transaction ]</button>
+            <button class="btn" style="padding: 0.4rem 0.85rem; font-size: 0.8rem;" onclick="triggerDemoIngest(10)">[ +10 Transactions ]</button>
+            <button class="btn" style="padding: 0.4rem 0.85rem; font-size: 0.8rem; background-color: var(--accent-green);" onclick="toggleStream(true)">[ Start Live Stream ]</button>
+            <button class="btn" style="padding: 0.4rem 0.85rem; font-size: 0.8rem; background-color: var(--accent-rose); color: #fff;" onclick="toggleStream(false)">[ Stop Live Stream ]</button>
+        </div>
+    </div>
+</div>
+
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-title">Total Completed Revenue</div>
+        <div class="kpi-value" id="kpi-total-revenue">£{{ "%.2f"|format(kpis.total_revenue) }}</div>
+        <div class="kpi-subtext" id="kpi-sim-rev">£{{ "%.2f"|format(kpis.simulated_revenue) }} live volume</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Total Completed Orders</div>
+        <div class="kpi-value" id="kpi-total-orders">{{ "{:,}".format(kpis.total_orders) }}</div>
+        <div class="kpi-subtext" id="kpi-sim-count">{{ "{:,}".format(kpis.simulated_count) }} tx ingested</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Purchasing Customers</div>
+        <div class="kpi-value" id="kpi-unique-customers">{{ "{:,}".format(kpis.unique_customers) }}</div>
+        <div class="kpi-subtext">Identified customer IDs</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Average Order Value</div>
+        <div class="kpi-value" id="kpi-aov">£{{ "%.2f"|format(kpis.aov) }}</div>
+        <div class="kpi-subtext">Revenue / Orders</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Repeat Customer Rate</div>
+        <div class="kpi-value" id="kpi-repeat-rate">{{ "%.2f"|format(kpis.repeat_rate) }}%</div>
+        <div class="kpi-subtext" id="kpi-repeat-customers">{{ "{:,}".format(kpis.repeat_customers) }} repeat buyers</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">High-Risk Customers</div>
+        <div class="kpi-value">{{ "{:,}".format(kpis.high_risk_customers) }}</div>
+        <div class="kpi-subtext warning">£{{ "%.2f"|format(kpis.high_risk_revenue) }} prior spend</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Cancellation Rate</div>
+        <div class="kpi-value" id="kpi-cancellation-rate">{{ "%.2f"|format(kpis.cancellation_rate) }}%</div>
+        <div class="kpi-subtext warning" id="kpi-cancelled-lines">{{ "{:,}".format(kpis.cancelled_lines) }} cancelled lines</div>
+    </div>
+</div>
+
+<div class="table-card" style="margin-bottom: 2rem;">
+    <h3 style="margin-bottom: 1rem;">Real-Time Transaction Activity Feed</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Invoice No</th>
+                <th>Product Description</th>
+                <th>Quantity</th>
+                <th>Line Total (£)</th>
+                <th>Country</th>
+                <th>Data Provenance</th>
+            </tr>
+        </thead>
+        <tbody id="live-transaction-feed">
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted);">Loading real-time stream...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="charts-grid">
+    <div class="chart-card">
+        <div class="chart-title">Monthly Revenue Trend (£)</div>
+        <canvas id="monthlyChart"></canvas>
+    </div>
+    <div class="chart-card">
+        <div class="chart-title">Top 10 Export Markets by Revenue</div>
+        <canvas id="countryChart"></canvas>
+    </div>
+</div>
+
+<div class="charts-grid">
+    <div class="chart-card">
+        <div class="chart-title">Top 10 Commercial Retail Products</div>
+        <canvas id="productChart"></canvas>
+    </div>
+    <div class="chart-card">
+        <div class="chart-title">RFM Customer Segment Distribution</div>
+        <canvas id="segmentChart"></canvas>
+    </div>
+</div>
+{% endblock %}

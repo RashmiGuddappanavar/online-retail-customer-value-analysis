@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Revenue Performance & Growth | Online Retail Analytics{% endblock %}
+
+{% block content %}
+<div class="header-section">
+    <h1>Monthly Revenue & Trend Analytics</h1>
+    <p>25-month time-series revenue, completed order volume, and Month-over-Month (MoM) growth trajectory.</p>
+</div>
+
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-title">Total Completed Sales</div>
+        <div class="kpi-value">£{{ "%.2f"|format(kpis.total_revenue) }}</div>
+        <div class="kpi-subtext">25 calendar months</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Completed Orders</div>
+        <div class="kpi-value">{{ "{:,}".format(kpis.total_orders) }}</div>
+        <div class="kpi-subtext">Distinct invoices</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Average Order Value</div>
+        <div class="kpi-value">£{{ "%.2f"|format(kpis.aov) }}</div>
+        <div class="kpi-subtext">Overall portfolio AOV</div>
+    </div>
+</div>
+
+<div class="table-card">
+    <h3 style="margin-bottom: 1rem;">Monthly Time Series Performance</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Year / Month</th>
+                <th>Completed Revenue</th>
+                <th>MoM Growth (%)</th>
+                <th>Completed Orders</th>
+                <th>Purchasing Customers</th>
+                <th>Monthly AOV (£)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in monthly %}
+            <tr>
+                <td><strong>{{ m.YearMonth }}</strong></td>
+                <td><strong>£{{ "%.2f"|format(m.Completed_Revenue) }}</strong></td>
+                <td>
+                    {% if m.MoM_Growth_Pct is not none and m.MoM_Growth_Pct == m.MoM_Growth_Pct %}
+                    <span class="badge {% if m.MoM_Growth_Pct >= 0 %}badge-pass{% else %}badge-high{% endif %}">
+                        {{ "%+.2f"|format(m.MoM_Growth_Pct) }}%
+                    </span>
+                    {% else %}
+                    <span class="badge badge-low">Baseline</span>
+                    {% endif %}
+                </td>
+                <td>{{ "{:,}".format(m.Completed_Orders|int) }}</td>
+                <td>{{ "{:,}".format(m.Unique_Customers|int) }}</td>
+                <td>£{{ "%.2f"|format(m.AOV) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

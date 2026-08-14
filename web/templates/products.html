@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Commercial Product Analytics | Online Retail Analytics{% endblock %}
+
+{% block content %}
+<div class="header-section">
+    <h1>Product Performance Analytics</h1>
+    <p>Revenue, order quantity, and pricing analysis across commercial retail inventory.</p>
+</div>
+
+<div class="table-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3>Product Catalog & Search</h3>
+        <form class="search-bar" style="margin-bottom: 0;" method="GET" action="/products">
+            <input type="text" name="q" class="search-input" placeholder="Search description or StockCode..." value="{{ search_query }}">
+            <button type="submit" class="btn">Search</button>
+        </form>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>StockCode</th>
+                <th>Description</th>
+                <th>Completed Revenue</th>
+                <th>Total Quantity Sold</th>
+                <th>Completed Orders</th>
+                <th>Avg Unit Price (£)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in products %}
+            <tr>
+                <td><code>{{ p.StockCode }}</code></td>
+                <td>{{ p.Description }}</td>
+                <td><strong>£{{ "%.2f"|format(p.TotalRevenue if p.TotalRevenue is defined else p.Completed_Revenue) }}</strong></td>
+                <td>{{ "{:,}".format(p.TotalQuantity|int if p.TotalQuantity is defined else p.Total_Quantity|int) }}</td>
+                <td>{{ "{:,}".format(p.TotalOrders|int if p.TotalOrders is defined else p.Completed_Orders|int) }}</td>
+                <td>£{{ "%.2f"|format(p.AvgUnitPrice if p.AvgUnitPrice is defined else p.Avg_UnitPrice) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

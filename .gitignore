@@ -11,6 +11,7 @@ ENV/
 retail_cleaned.csv
 **/retail_cleaned.csv
 data/processed/retail_cleaned.csv
+data/processed/*.db
 powerbi/powerbi_data/retail_cleaned.csv
 tableau/tableau_data/retail_cleaned.csv
 

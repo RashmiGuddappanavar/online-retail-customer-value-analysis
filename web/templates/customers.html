@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Intelligence & RFM Segmentation | Online Retail Analytics{% endblock %}
+
+{% block content %}
+<div class="header-section">
+    <h1>Customer Intelligence & Churn Risk Analytics</h1>
+    <p>RFM Segmentation modeling and business logic rule classification for customer retention.</p>
+</div>
+
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-title">Total Identified Customers</div>
+        <div class="kpi-value">{{ "{:,}".format(kpis.unique_customers) }}</div>
+        <div class="kpi-subtext">Mapped with CustomerID</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Repeat Buyer Rate</div>
+        <div class="kpi-value">{{ "%.2f"|format(kpis.repeat_rate) }}%</div>
+        <div class="kpi-subtext">2+ completed purchases</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">Churn Risk Proxy (High Risk)</div>
+        <div class="kpi-value">{{ "{:,}".format(kpis.high_risk_customers) }}</div>
+        <div class="kpi-subtext warning">Inactive > 90 days with 2+ orders</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-title">High-Risk Prior Revenue</div>
+        <div class="kpi-value">£{{ "%.2f"|format(kpis.high_risk_revenue) }}</div>
+        <div class="kpi-subtext warning">Historical spend at risk</div>
+    </div>
+</div>
+
+<div class="table-card">
+    <h3 style="margin-bottom: 1rem;">Churn Risk Proxy Breakdown</h3>
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+        <em>Note: Classified using business logic rule engine (Churn Risk Proxy). Dataset has no observed explicit cancellation labels.</em>
+    </p>
+    <table>
+        <thead>
+            <tr>
+                <th>Risk Tier</th>
+                <th>Customer Count</th>
+                <th>Total Prior Revenue</th>
+                <th>Avg Recency (Days)</th>
+                <th>Avg Order Frequency</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for risk in churn_risk %}
+            <tr>
+                <td>
+                    <span class="badge {% if 'High' in risk.ChurnRiskProxy %}badge-high{% elif 'Medium' in risk.ChurnRiskProxy %}badge-medium{% else %}badge-low{% endif %}">
+                        {{ risk.ChurnRiskProxy }}
+                    </span>
+                </td>
+                <td>{{ "{:,}".format(risk.count) }}</td>
+                <td>£{{ "%.2f"|format(risk.total_revenue) }}</td>
+                <td>{{ "%.1f"|format(risk.avg_recency) }}</td>
+                <td>{{ "%.2f"|format(risk.avg_frequency) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="table-card">
+    <h3 style="margin-bottom: 1rem;">RFM Segment Metrics</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Customer Segment</th>
+                <th>Customer Count</th>
+                <th>Total Revenue</th>
+                <th>Avg Recency (Days)</th>
+                <th>Avg Frequency</th>
+                <th>Avg Monetary (£)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for seg in segments %}
+            <tr>
+                <td><strong>{{ seg.CustomerSegment }}</strong></td>
+                <td>{{ "{:,}".format(seg.count) }}</td>
+                <td>£{{ "%.2f"|format(seg.total_revenue) }}</td>
+                <td>{{ "%.1f"|format(seg.avg_recency) }}</td>
+                <td>{{ "%.2f"|format(seg.avg_frequency) }}</td>
+                <td>£{{ "%.2f"|format(seg.avg_monetary) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="table-card">
+    <h3 style="margin-bottom: 1rem;">Customer Search & Explorer (Top 100)</h3>
+    <form class="search-bar" method="GET" action="/customers">
+        <input type="text" name="q" class="search-input" placeholder="Search CustomerID..." value="{{ request.args.get('q', '') }}">
+        <button type="submit" class="btn">Filter</button>
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <th>Customer ID</th>
+                <th>RFM Segment</th>
+                <th>Churn Risk Proxy</th>
+                <th>Recency (Days)</th>
+                <th>Frequency</th>
+                <th>Monetary (£)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in customers %}
+            <tr>
+                <td><strong>{{ c.CustomerID|int }}</strong></td>
+                <td>{{ c.CustomerSegment }}</td>
+                <td>
+                    <span class="badge {% if 'High' in c.ChurnRiskProxy %}badge-high{% elif 'Medium' in c.ChurnRiskProxy %}badge-medium{% else %}badge-low{% endif %}">
+                        {{ c.ChurnRiskProxy }}
+                    </span>
+                </td>
+                <td>{{ c.Recency }}</td>
+                <td>{{ c.Frequency }}</td>
+                <td>£{{ "%.2f"|format(c.Monetary) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Geographic Market Performance | Online Retail Analytics{% endblock %}
+
+{% block content %}
+<div class="header-section">
+    <h1>Geographic Performance Analytics</h1>
+    <p>International market breakdown across 43 purchasing countries.</p>
+</div>
+
+<div class="table-card">
+    <h3 style="margin-bottom: 1rem;">Country Revenue & Contribution Breakdown</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Country</th>
+                <th>Completed Revenue</th>
+                <th>Revenue Share (%)</th>
+                <th>Completed Orders</th>
+                <th>Purchasing Customers</th>
+                <th>Average Order Value (£)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in countries %}
+            <tr>
+                <td><strong>{{ c.Country }}</strong></td>
+                <td><strong>£{{ "%.2f"|format(c.Completed_Revenue) }}</strong></td>
+                <td>
+                    <span class="badge {% if c.Country == 'United Kingdom' %}badge-pass{% else %}badge-low{% endif %}">
+                        {{ "%.2f"|format(c.Revenue_Share_Pct) }}%
+                    </span>
+                </td>
+                <td>{{ "{:,}".format(c.Completed_Orders|int) }}</td>
+                <td>{{ "{:,}".format(c.Unique_Customers|int) if c.Unique_Customers else 'Guest' }}</td>
+                <td>£{{ "%.2f"|format(c.AOV) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

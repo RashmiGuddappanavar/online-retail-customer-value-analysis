@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Data Quality & Pipeline Audit | Online Retail Analytics{% endblock %}
+
+{% block content %}
+<div class="header-section">
+    <h1>Data Quality Audit & Pipeline Integrity</h1>
+    <p>Automated pipeline verification metrics and rule assertions across raw Excel sheets.</p>
+</div>
+
+<div class="table-card" style="margin-bottom: 2rem;">
+    <h3 style="margin-bottom: 1rem;">Data Quality Validation Assertions</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Validation Metric / Rule Assertion</th>
+                <th>Status</th>
+                <th>Validation Details & Reconciliation Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in validations %}
+            <tr>
+                <td><strong>{{ v.check }}</strong></td>
+                <td><span class="badge badge-pass">{{ v.status }}</span></td>
+                <td>{{ v.details }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="table-card">
+    <h3 style="margin-bottom: 1rem;">Pipeline Audit Log Metrics</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Audit Metric Parameter</th>
+                <th>Measured Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in metrics %}
+            <tr>
+                <td><strong>{{ m.Metric }}</strong></td>
+                <td><code>{{ m.Value }}</code></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
